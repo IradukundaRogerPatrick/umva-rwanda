@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a2540">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Umva — Mental Health Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0a2540;--navy2:#0e3060;--blue:#1a56a0;--blue2:#2d7dd2;
+  --teal:#00c9a7;--teal2:#00a888;
+  --teal-bg:rgba(0,201,167,0.1);--teal-bd:rgba(0,201,167,0.3);
+  --white:#ffffff;--muted:#7a94ae;
+  --card-bg:rgba(255,255,255,0.06);--card-bd:rgba(255,255,255,0.12);
+  --danger:#ff4757;--success:#2ed573;--warn:#ffa502;--gold:#f5c842;
+  --fs:'DM Sans',sans-serif;--fd:'Playfair Display',serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--fs);background:#060f1e}
+
+/* ── RESPONSIVE LAYOUT ── */
+#shell{
+  width:100vw;height:100vh;
+  background:var(--navy);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+@media(min-width:600px){
+  body{display:flex;justify-content:center;align-items:center}
+  #shell{
+    width:420px;height:860px;
+    border-radius:40px;
+    box-shadow:0 40px 120px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.08);
+  }
+}
+
+/* ── SCREENS ── */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.screen.show{display:flex}
+.scrollable{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scrollable::-webkit-scrollbar{width:3px}
+.scrollable::-webkit-scrollbar-thumb{background:var(--card-bd);border-radius:2px}
+
+/* ── TYPOGRAPHY ── */
+.t-display{font-family:var(--fd);font-size:52px;font-weight:700;color:var(--white);line-height:1}
+.t-h1{font-family:var(--fd);font-size:26px;font-weight:600;color:var(--white);line-height:1.25}
+.t-h2{font-size:18px;font-weight:600;color:var(--white)}
+.t-h3{font-size:15px;font-weight:600;color:var(--white)}
+.t-body{font-size:14px;color:var(--muted);line-height:1.65}
+.t-small{font-size:12px;color:var(--muted)}
+.t-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.t-teal{color:var(--teal)}
+.t-success{color:var(--success)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:none;outline:none;font-family:var(--fs);transition:opacity .15s,transform .15s;user-select:none}
+.btn:active{opacity:.8;transform:scale(.97)}
+.btn-main{background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--navy);font-size:16px;font-weight:700;padding:15px 36px;border-radius:50px;width:100%;box-shadow:0 6px 24px rgba(0,201,167,0.35)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.22);color:rgba(255,255,255,0.75);font-size:14px;font-weight:500;padding:12px 22px;border-radius:50px}
+.btn-teal-sm{background:var(--teal-bg);border:1.5px solid var(--teal-bd);color:var(--teal);font-size:13px;font-weight:600;padding:9px 18px;border-radius:50px}
+.btn-success{background:linear-gradient(135deg,var(--success),#22bb55);color:var(--navy);font-size:13px;font-weight:700;padding:10px 18px;border-radius:50px}
+.btn-icon{width:40px;height:40px;background:var(--card-bg);border:1px solid var(--card-bd);border-radius:12px;color:var(--white);font-size:18px;flex-shrink:0}
+
+/* ── CARDS ── */
+.card{background:var(--card-bg);border:1px solid var(--card-bd);border-radius:20px;padding:18px}
+.card-teal{background:var(--teal-bg);border:1px solid var(--teal-bd);border-radius:20px;padding:18px}
+.card-danger{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.22);border-radius:20px;padding:18px}
+.card-click{cursor:pointer}.card-click:active{opacity:.85;transform:scale(.99)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.5px}
+.bdg-teal{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-bd)}
+.bdg-blue{background:rgba(45,125,210,0.15);color:var(--blue2);border:1px solid rgba(45,125,210,0.3)}
+.bdg-gold{background:rgba(245,200,66,0.12);color:var(--gold);border:1px solid rgba(245,200,66,0.28)}
+.bdg-success{background:rgba(46,213,115,0.12);color:var(--success);border:1px solid rgba(46,213,115,0.28)}
+
+/* ── LAYOUT ── */
+.px{padding-left:20px;padding-right:20px}
+.pb-nav{padding-bottom:88px}
+.row{display:flex;flex-direction:row;align-items:center}
+.row-btwn{display:flex;flex-direction:row;align-items:center;justify-content:space-between}
+.col{display:flex;flex-direction:column}
+.gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── HEADER ── */
+.s-header{padding:52px 20px 16px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.s-title{font-family:var(--fd);font-size:22px;color:var(--white);font-weight:600}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:absolute;bottom:0;left:0;right:0;height:78px;background:rgba(10,37,64,0.96);backdrop-filter:blur(16px);border-top:1px solid var(--card-bd);display:flex;align-items:center;justify-content:space-around;padding-bottom:10px;z-index:50;flex-shrink:0}
+.nbtn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px 12px;border-radius:12px;font-family:var(--fs)}
+.nbtn .ni{font-size:22px}
+.nbtn .nl{font-size:10px;font-weight:500;color:var(--muted)}
+.nbtn.on .nl{color:var(--teal)}
+.nbtn.on .ni{filter:drop-shadow(0 0 5px var(--teal))}
+
+/* ── ONLINE DOT ── */
+.odot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── ICON BOX ── */
+.ibox{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+
+/* ── PROGRESS ── */
+.pbars{display:flex;gap:6px;margin-bottom:28px}
+.pbar{flex:1;height:3px;border-radius:2px;background:var(--card-bd)}
+.pbar.done{background:var(--teal)}
+.pbar.cur{background:linear-gradient(90deg,var(--teal),var(--blue2))}
+
+/* ── OPTION BTN ── */
+.optbtn{background:var(--card-bg);border:1.5px solid var(--card-bd);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;width:100%;transition:all .15s;font-family:var(--fs)}
+.optbtn:active,.optbtn.sel{background:var(--teal-bg);border-color:var(--teal-bd)}
+.oe{font-size:26px;flex-shrink:0}
+.ol{font-size:15px;color:var(--white);font-weight:500}
+.os{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ── MOOD ── */
+.moodrow{display:flex;gap:8px}
+.moodbtn{flex:1;background:var(--card-bg);border:1.5px solid var(--card-bd);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:var(--fs)}
+.moodbtn:active,.moodbtn.sel{background:var(--teal-bg);border-color:var(--teal-bd)}
+.me{font-size:24px}
+.ml{font-size:10px;color:var(--muted)}
+
+/* ── AUDIO CARD ── */
+.acard{background:var(--card-bg);border:1px solid var(--card-bd);border-radius:16px;padding:14px;display:flex;align-items:center;gap:14px;cursor:pointer}
+.acard:active{opacity:.8}
+.athumb{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.aplay{width:36px;height:36px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--navy);flex-shrink:0}
+.aplay.playing{background:var(--warn);animation:pulse2 .8s infinite}
+@keyframes pulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+/* ── RSL SCROLL ── */
+.rslscroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.rslscroll::-webkit-scrollbar{display:none}
+.rslvid{flex-shrink:0;width:115px;background:var(--card-bg);border:1px solid var(--card-bd);border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center}
+.rslvid:active{opacity:.8}
+.rslvid.playing{border-color:var(--teal-bd);background:var(--teal-bg)}
+.rvthumb{font-size:30px;margin-bottom:8px}
+.rvname{font-size:11px;color:var(--muted);line-height:1.35}
+
+/* ── MEDIA PLAYER ── */
+#player-bar{position:absolute;bottom:78px;left:0;right:0;background:var(--navy2);border-top:1px solid var(--card-bd);padding:12px 20px;display:none;align-items:center;gap:14px;z-index:49}
+#player-bar.show{display:flex}
+.player-info{flex:1;overflow:hidden}
+.player-title{font-size:14px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-sub{font-size:12px;color:var(--muted)}
+.player-prog{height:3px;background:var(--card-bd);border-radius:2px;margin-top:8px;overflow:hidden}
+.player-fill{height:100%;background:var(--teal);width:0%;transition:width .5s linear;border-radius:2px}
+
+/* ── COUNSELLOR CARD ── */
+.ccard{background:var(--card-bg);border:1px solid var(--card-bd);border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer}
+.ccard:active{opacity:.85}
+.cavatar{width:52px;height:52px;border-radius:50%;background:var(--teal-bg);border:2px solid var(--teal-bd);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+
+/* ── CHAT ── */
+.cmsg{max-width:78%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5}
+.cmsg.recv{background:var(--card-bg);border:1px solid var(--card-bd);color:var(--white);align-self:flex-start;border-bottom-left-radius:4px}
+.cmsg.sent{background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--navy);font-weight:500;align-self:flex-end;border-bottom-right-radius:4px}
+.mtime{font-size:10px;color:var(--muted);margin-top:4px}
+.sent .mtime{color:rgba(10,37,64,.5)}
+.typing{display:none;align-self:flex-start;background:var(--card-bg);border:1px solid var(--card-bd);border-radius:18px;border-bottom-left-radius:4px;padding:12px 18px;gap:5px}
+.typing.show{display:flex}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tdot 1.2s infinite}
+.tdot:nth-child(2){animation-delay:.2s}
+.tdot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-4px);opacity:1}}
+
+/* ── HOTLINE CARD ── */
+.hlcard{background:var(--card-bg);border:1px solid var(--card-bd);border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px}
+
+/* ── REFERRAL STEP ── */
+.rstep{display:flex;gap:14px;padding-bottom:24px;position:relative}
+.rstep:not(:last-child)::after{content:'';position:absolute;left:18px;top:40px;bottom:0;width:2px;background:var(--card-bd)}
+.rnum{width:38px;height:38px;border-radius:50%;background:var(--teal-bg);border:2px solid var(--teal-bd);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--teal);flex-shrink:0;font-family:var(--fd)}
+
+/* ── BREATHE ── */
+.bcircle{width:90px;height:90px;border-radius:50%;background:var(--teal-bg);border:2.5px solid var(--teal-bd);display:flex;align-items:center;justify-content:center;font-size:36px;margin:16px auto;transition:transform 4s ease,background 4s ease}
+.bcircle.inhale{transform:scale(1.4);background:rgba(0,201,167,0.22)}
+
+/* ── TOAST ── */
+#toast{position:absolute;bottom:90px;left:16px;right:16px;background:rgba(14,48,96,.96);border:1px solid var(--teal-bd);border-radius:14px;padding:13px 18px;font-size:14px;color:var(--white);text-align:center;z-index:300;display:none;backdrop-filter:blur(12px)}
+
+/* ── RESULT ACTION BTN ── */
+.ract{padding:14px 20px;border-radius:50px;font-family:var(--fs);font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:opacity .15s}
+.ract:active{opacity:.8}
+.ract.primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--navy);border:none}
+.ract.secondary{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,0.2)}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ══════════════════════════════
+     SCREEN 1 — SPLASH
+══════════════════════════════ -->
+<div class="screen show" id="s-splash">
+  <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0a2540 0%,#0e3060 55%,#0a2540 100%)">
+    <div style="position:absolute;width:400px;height:400px;top:-120px;right:-100px;border-radius:50%;background:radial-gradient(circle,rgba(0,201,167,.12) 0%,transparent 70%)"></div>
+    <div style="position:absolute;width:300px;height:300px;bottom:60px;left:-80px;border-radius:50%;background:radial-gradient(circle,rgba(26,86,160,.18) 0%,transparent 70%)"></div>
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.045) 1px,transparent 1px);background-size:28px 28px"></div>
+  </div>
+  <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;gap:0;text-align:center">
+    <div style="margin-bottom:24px;filter:drop-shadow(0 8px 24px rgba(0,201,167,.45));animation:float 3s ease-in-out infinite">
+      <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00c9a7"/>
+            <stop offset="100%" stop-color="#2d7dd2"/>
+          </linearGradient>
+        </defs>
+        <circle cx="55" cy="55" r="53" fill="#0e3060" stroke="url(#lg)" stroke-width="2"/>
+        <path d="M55 20C38 20 26 33 26 50c0 12 6 23 17 29 0 6-4 10-8 13" stroke="url(#lg)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M55 32c-11 0-18 8-18 18 0 8 5 14 12 17" stroke="#00c9a7" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
+        <path d="M67 34c8 7 8 27 0 34" stroke="#00c9a7" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>
+        <path d="M76 26c12 11 12 39 0 50" stroke="#00c9a7" stroke-width="2" fill="none" stroke-linecap="round" opacity=".4"/>
+        <circle cx="49" cy="72" r="4" fill="#00c9a7"/>
+        <circle cx="49" cy="72" r="2" fill="#0e3060"/>
+        <circle cx="36" cy="95" r="3" fill="#2d7dd2" opacity=".8"/>
+        <circle cx="46" cy="100" r="3" fill="#00c9a7" opacity=".8"/>
+        <circle cx="56" cy="102" r="3" fill="#2d7dd2" opacity=".8"/>
+      </svg>
+    </div>
+    <div class="t-display" style="margin-bottom:8px">Umva</div>
+    <div class="t-teal" style="font-size:13px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px">Kumva &nbsp;·&nbsp; Gusobanukirwa &nbsp;·&nbsp; Gufasha</div>
+    <div class="t-body" style="margin-bottom:40px;max-width:280px">Listen. Feel. Understand.<br>A peer mental health platform for Rwandan youth.</div>
+    <button class="btn btn-main" onclick="nav('s-onboard')" style="max-width:280px">Tangira / Get Started</button>
+    <div class="t-small" style="margin-top:16px">🇷🇼 Kinyarwanda &nbsp;·&nbsp; English &nbsp;·&nbsp; Rwandan Sign Language</div>
+  </div>
+</div>
+<style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}</style>
+
+<!-- ══════════════════════════════
+     SCREEN 2 — ONBOARDING
+══════════════════════════════ -->
+<div class="screen" id="s-onboard">
+  <div style="flex:1;position:relative;overflow:hidden">
+    <div class="ob-slide" id="ob0" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;gap:16px">
+      <div style="font-size:80px">🫂</div>
+      <div class="t-h1">You are not alone</div>
+      <div class="t-body">1 in 5 Rwandan youth lives with depression, anxiety, or trauma in silence. Umva creates a safe, stigma-free space where your feelings are heard — without judgment.</div>
+    </div>
+    <div class="ob-slide" id="ob1" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;gap:16px">
+      <div style="font-size:80px">🤝</div>
+      <div class="t-h1">Privacy-safe peer counsellors</div>
+      <div class="t-body">Our trained peer counsellors come from neighbouring communities — close enough to understand your context, separate enough to fully protect your privacy.</div>
+    </div>
+    <div class="ob-slide" id="ob2" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;gap:16px">
+      <div style="font-size:80px">🦻</div>
+      <div class="t-h1">Inclusive for everyone</div>
+      <div class="t-body">Kinyarwanda audio, English text, and Rwandan Sign Language videos — Umva serves every young Rwandan, including the deaf community.</div>
+    </div>
+    <div class="ob-slide" id="ob3" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;gap:16px">
+      <div style="font-size:80px">📵</div>
+      <div class="t-h1">Works without internet</div>
+      <div class="t-body">Umva is offline-capable. No internet? No problem. Your wellness data and all content stay available wherever you are in Rwanda.</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;padding:14px">
+    <div class="ob-dot" id="od0" style="height:8px;border-radius:4px;background:var(--teal);transition:width .3s;width:24px"></div>
+    <div class="ob-dot" id="od1" style="height:8px;width:8px;border-radius:4px;background:var(--card-bd);transition:width .3s"></div>
+    <div class="ob-dot" id="od2" style="height:8px;width:8px;border-radius:4px;background:var(--card-bd);transition:width .3s"></div>
+    <div class="ob-dot" id="od3" style="height:8px;width:8px;border-radius:4px;background:var(--card-bd);transition:width .3s"></div>
+  </div>
+  <div style="padding:10px 24px 36px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0">
+    <button class="btn btn-outline" id="ob-back" onclick="obPrev()" style="display:none;min-width:90px">← Back</button>
+    <button class="btn btn-outline" onclick="nav('s-home')" style="min-width:80px">Skip</button>
+    <button class="btn btn-main" id="ob-next" onclick="obNext()" style="flex:1;max-width:180px">Next →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 3 — HOME
+══════════════════════════════ -->
+<div class="screen" id="s-home">
+  <div style="padding:52px 20px 20px;background:linear-gradient(180deg,var(--navy2),var(--navy));position:relative;overflow:hidden;flex-shrink:0">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(0,201,167,.08) 0%,transparent 60%)"></div>
+    <div class="t-label t-teal" style="position:relative">Muraho 👋</div>
+    <div class="t-h1" style="position:relative;margin-top:4px">How are you today?</div>
+    <div class="t-small" style="position:relative;margin-top:3px" id="h-date"></div>
+    <div class="badge bdg-teal" style="position:absolute;top:52px;right:20px">🔥 <span id="h-streak">3</span> day streak</div>
+  </div>
+  <div class="scrollable pb-nav" style="flex:1">
+    <div class="px" style="padding-top:20px;display:flex;flex-direction:column;gap:0">
+      <div class="card" style="margin-bottom:20px">
+        <div class="t-h3" style="margin-bottom:4px">Quick check-in</div>
+        <div class="t-small" style="margin-bottom:14px">How are you feeling right now?</div>
+        <div class="moodrow">
+          <button class="moodbtn" onclick="qMood(this,'😢','Sad')"><span class="me">😢</span><span class="ml">Sad</span></button>
+          <button class="moodbtn" onclick="qMood(this,'😟','Anxious')"><span class="me">😟</span><span class="ml">Anxious</span></button>
+          <button class="moodbtn" onclick="qMood(this,'😐','Okay')"><span class="me">😐</span><span class="ml">Okay</span></button>
+          <button class="moodbtn" onclick="qMood(this,'🙂','Good')"><span class="me">🙂</span><span class="ml">Good</span></button>
+          <button class="moodbtn" onclick="qMood(this,'😊','Great')"><span class="me">😊</span><span class="ml">Great</span></button>
+        </div>
+      </div>
+      <div class="t-label" style="margin-bottom:14px">What would you like to do?</div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div class="card card-click" onclick="nav('s-checkin')" style="display:flex;flex-direction:column;gap:10px">
+          <div class="ibox" style="background:rgba(0,201,167,.15)">🧠</div>
+          <div class="t-h3">Wellness Check-in</div>
+          <div class="t-small">3 questions about your mental state</div>
+        </div>
+        <div class="card card-click" onclick="nav('s-learn')" style="display:flex;flex-direction:column;gap:10px">
+          <div class="ibox" style="background:rgba(26,86,160,.2)">🎧</div>
+          <div class="t-h3">Listen &amp; Learn</div>
+          <div class="t-small">Audio in Kinyarwanda &amp; RSL videos</div>
+        </div>
+        <div class="card card-click" onclick="nav('s-peer')" style="display:flex;flex-direction:column;gap:10px">
+          <div class="ibox" style="background:rgba(245,200,66,.15)">🤝</div>
+          <div class="t-h3">Talk to a Peer</div>
+          <div class="t-small">Anonymous counsellor chat</div>
+        </div>
+        <div class="card card-click" onclick="nav('s-referral')" style="display:flex;flex-direction:column;gap:10px">
+          <div class="ibox" style="background:rgba(46,213,115,.15)">🏥</div>
+          <div class="t-h3">Get Professional Help</div>
+          <div class="t-small">Mutuelle de Santé referral</div>
+        </div>
+      </div>
+      <div class="card-danger card-click row" onclick="nav('s-crisis')" style="gap:14px;margin-bottom:20px">
+        <div class="ibox" style="background:rgba(255,71,87,.15);font-size:26px">🆘</div>
+        <div style="flex:1">
+          <div class="t-h3" style="color:#ff6b7a">Crisis Support</div>
+          <div class="t-small">Immediate help — available 24/7</div>
+        </div>
+        <div style="color:#ff6b7a;font-size:22px">›</div>
+      </div>
+      <div class="t-label" style="margin-bottom:14px">Peer circles near you</div>
+      <div class="card row" style="gap:14px">
+        <div style="font-size:36px">👥</div>
+        <div class="col gap4">
+          <div class="t-h3">Gikondo Community Centre</div>
+          <div class="t-small">Saturday 10:00 AM · 8 spots available</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="nbtn on" onclick="nav('s-home')"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nbtn" onclick="nav('s-checkin')"><span class="ni">🧠</span><span class="nl">Check-in</span></button>
+    <button class="nbtn" onclick="nav('s-learn')"><span class="ni">🎧</span><span class="nl">Learn</span></button>
+    <button class="nbtn" onclick="nav('s-peer')"><span class="ni">💬</span><span class="nl">Peer</span></button>
+    <button class="nbtn" onclick="nav('s-crisis')"><span class="ni">🆘</span><span class="nl">Crisis</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 4 — CHECK-IN
+══════════════════════════════ -->
+<div class="screen" id="s-checkin">
+  <div class="s-header"><button class="btn btn-icon" onclick="nav('s-home')">←</button><div class="s-title">Wellness Check-in</div></div>
+  <div class="scrollable pb-nav px" style="flex:1;padding-top:8px">
+    <div class="pbars"><div class="pbar cur" id="pb1"></div><div class="pbar" id="pb2"></div><div class="pbar" id="pb3"></div></div>
+    <div id="cq1" class="col gap12">
+      <div class="t-h1" style="margin-bottom:4px">How have you been feeling this week?</div>
+      <div class="t-body" style="margin-bottom:8px">Your answers are private and never shared with anyone.</div>
+      <button class="optbtn" onclick="cAns(1,this,'verylow')"><span class="oe">😢</span><div><div class="ol">Very low or hopeless</div><div class="os">Feeling like things will not get better</div></div></button>
+      <button class="optbtn" onclick="cAns(1,this,'low')"><span class="oe">😟</span><div><div class="ol">Struggling a bit</div><div class="os">More stress or worry than usual</div></div></button>
+      <button class="optbtn" onclick="cAns(1,this,'okay')"><span class="oe">😐</span><div><div class="ol">Managing okay</div><div class="os">Some ups and downs but coping</div></div></button>
+      <button class="optbtn" onclick="cAns(1,this,'good')"><span class="oe">😊</span><div><div class="ol">Feeling good</div><div class="os">Generally positive and stable</div></div></button>
+    </div>
+    <div id="cq2" class="col gap12" style="display:none">
+      <div class="t-h1" style="margin-bottom:4px">Have you had someone to talk to?</div>
+      <div class="t-body" style="margin-bottom:8px">Social support is one of the strongest protectors of mental health.</div>
+      <button class="optbtn" onclick="cAns(2,this,'none')"><span class="oe">🚶</span><div><div class="ol">No, I feel quite alone</div><div class="os">No one I feel safe talking to</div></div></button>
+      <button class="optbtn" onclick="cAns(2,this,'some')"><span class="oe">🤔</span><div><div class="ol">Not really</div><div class="os">People around but have not opened up</div></div></button>
+      <button class="optbtn" onclick="cAns(2,this,'yes')"><span class="oe">🤝</span><div><div class="ol">Yes, a little</div><div class="os">Talked to someone briefly</div></div></button>
+      <button class="optbtn" onclick="cAns(2,this,'strong')"><span class="oe">💪</span><div><div class="ol">Yes, I have strong support</div><div class="os">Family or friends who really listen</div></div></button>
+    </div>
+    <div id="cq3" class="col gap12" style="display:none">
+      <div class="t-h1" style="margin-bottom:4px">What do you need most right now?</div>
+      <div class="t-body" style="margin-bottom:8px">We will suggest the right Umva resource for you.</div>
+      <button class="optbtn" onclick="cAns(3,this,'listen')"><span class="oe">👂</span><div><div class="ol">Someone to listen to me</div><div class="os">I need to be heard without judgment</div></div></button>
+      <button class="optbtn" onclick="cAns(3,this,'info')"><span class="oe">📚</span><div><div class="ol">Information and guidance</div><div class="os">Help understanding what I am going through</div></div></button>
+      <button class="optbtn" onclick="cAns(3,this,'calm')"><span class="oe">🧘</span><div><div class="ol">Techniques to calm down</div><div class="os">Breathing or grounding exercises</div></div></button>
+      <button class="optbtn" onclick="cAns(3,this,'pro')"><span class="oe">🏥</span><div><div class="ol">Professional support</div><div class="os">I think I need to talk to a specialist</div></div></button>
+    </div>
+    <div id="cresult" style="display:none;flex-direction:column;align-items:center;text-align:center;padding:20px 0;gap:16px">
+      <div id="cr-icon" style="width:90px;height:90px;border-radius:50%;background:var(--teal-bg);border:2px solid var(--teal-bd);display:flex;align-items:center;justify-content:center;font-size:44px"></div>
+      <div class="t-h1" id="cr-title"></div>
+      <div class="t-body" id="cr-text"></div>
+      <div id="cr-actions" class="col gap8" style="width:100%;margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 5 — LEARN
+══════════════════════════════ -->
+<div class="screen" id="s-learn">
+  <div class="s-header"><button class="btn btn-icon" onclick="nav('s-home')">←</button><div class="s-title">Listen &amp; Learn</div></div>
+  <div class="scrollable pb-nav px" style="flex:1;padding-top:8px">
+    <!-- RSL -->
+    <div class="card-teal" style="margin-bottom:20px">
+      <div class="row gap8" style="margin-bottom:14px">
+        <div class="badge bdg-blue">RSL</div>
+        <div class="t-h3">Rwandan Sign Language Videos</div>
+      </div>
+      <div class="rslscroll">
+        <div class="rslvid" id="rsl0" onclick="playRSL(0,'What is mental health?')"><div class="rvthumb">🧠</div><div class="rvname">What is mental health?</div></div>
+        <div class="rslvid" id="rsl1" onclick="playRSL(1,'Dealing with anxiety')"><div class="rvthumb">💆</div><div class="rvname">Dealing with anxiety</div></div>
+        <div class="rslvid" id="rsl2" onclick="playRSL(2,'How to ask for help')"><div class="rvthumb">🤝</div><div class="rvname">How to ask for help</div></div>
+        <div class="rslvid" id="rsl3" onclick="playRSL(3,'You are not alone')"><div class="rvthumb">🫂</div><div class="rvname">You are not alone</div></div>
+        <div class="rslvid" id="rsl4" onclick="playRSL(4,'Grief and loss')"><div class="rvthumb">🕊️</div><div class="rvname">Grief and loss</div></div>
+      </div>
+      <!-- RSL player -->
+      <div id="rsl-player" style="display:none;margin-top:14px;padding:14px;background:rgba(0,0,0,.2);border-radius:14px">
+        <div class="row gap8" style="margin-bottom:10px">
+          <div style="font-size:24px" id="rsl-icon">🧠</div>
+          <div style="flex:1"><div class="t-h3" id="rsl-title">What is mental health?</div><div class="t-small">Rwandan Sign Language · Demo</div></div>
+          <button onclick="stopRSL()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+        </div>
+        <div style="background:rgba(0,0,0,.3);border-radius:12px;height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+          <div style="font-size:48px" id="rsl-icon-big">🧠</div>
+          <div class="t-small" style="color:var(--teal)">▶ RSL Video Playing...</div>
+        </div>
+        <div class="player-prog" style="margin-top:10px"><div class="player-fill" id="rsl-fill"></div></div>
+      </div>
+    </div>
+    <!-- Kinyarwanda -->
+    <div class="t-label" style="margin-bottom:12px">Audio — Kinyarwanda</div>
+    <div class="col gap8" style="margin-bottom:20px">
+      <div class="acard" id="aud0" onclick="playAudio(0,'Gusobanukirwa Ubuzima Bwo Mu Mutwe','4:00')">
+        <div class="athumb" style="background:rgba(0,201,167,.15)">🎙️</div>
+        <div style="flex:1"><div class="t-h3">Gusobanukirwa Ubuzima Bwo Mu Mutwe</div><div class="row gap8" style="margin-top:4px"><span class="t-small">4:00</span><span class="badge bdg-teal" style="font-size:10px">🇷🇼 Kinyarwanda</span></div></div>
+        <div class="aplay" id="ap0">▶</div>
+      </div>
+      <div class="acard" id="aud1" onclick="playAudio(1,'Guhangana No Gutinya','5:00')">
+        <div class="athumb" style="background:rgba(26,86,160,.2)">🎙️</div>
+        <div style="flex:1"><div class="t-h3">Guhangana No Gutinya</div><div class="row gap8" style="margin-top:4px"><span class="t-small">5:00</span><span class="badge bdg-teal" style="font-size:10px">🇷🇼 Kinyarwanda</span></div></div>
+        <div class="aplay" id="ap1">▶</div>
+      </div>
+      <div class="acard" id="aud2" onclick="playAudio(2,'Kwivugira No Gushaka Ubufasha','3:00')">
+        <div class="athumb" style="background:rgba(245,200,66,.15)">🎙️</div>
+        <div style="flex:1"><div class="t-h3">Kwivugira No Gushaka Ubufasha</div><div class="row gap8" style="margin-top:4px"><span class="t-small">3:00</span><span class="badge bdg-teal" style="font-size:10px">🇷🇼 Kinyarwanda</span></div></div>
+        <div class="aplay" id="ap2">▶</div>
+      </div>
+    </div>
+    <!-- English -->
+    <div class="t-label" style="margin-bottom:12px">Audio — English</div>
+    <div class="col gap8">
+      <div class="acard" id="aud3" onclick="playAudio(3,'Understanding mental health','4:00')">
+        <div class="athumb" style="background:rgba(46,213,115,.12)">🎙️</div>
+        <div style="flex:1"><div class="t-h3">Understanding mental health</div><div class="row gap8" style="margin-top:4px"><span class="t-small">4:00</span><span class="badge bdg-blue" style="font-size:10px">🇬🇧 English</span></div></div>
+        <div class="aplay" id="ap3">▶</div>
+      </div>
+      <div class="acard" id="aud4" onclick="playAudio(4,'Managing stress every day','5:00')">
+        <div class="athumb" style="background:rgba(255,71,87,.1)">🎙️</div>
+        <div style="flex:1"><div class="t-h3">Managing stress every day</div><div class="row gap8" style="margin-top:4px"><span class="t-small">5:00</span><span class="badge bdg-blue" style="font-size:10px">🇬🇧 English</span></div></div>
+        <div class="aplay" id="ap4">▶</div>
+      </div>
+    </div>
+  </div>
+  <!-- Audio player bar -->
+  <div id="player-bar">
+    <div style="font-size:28px" id="pb-icon">🎙️</div>
+    <div class="player-info">
+      <div class="player-title" id="pb-title">—</div>
+      <div class="player-sub" id="pb-sub">Now playing</div>
+      <div class="player-prog"><div class="player-fill" id="pb-fill"></div></div>
+    </div>
+    <button onclick="stopAudio()" style="background:rgba(255,255,255,.1);border:none;color:var(--white);width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0">■</button>
+  </div>
+  <div class="bnav">
+    <button class="nbtn" onclick="nav('s-home')"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nbtn" onclick="nav('s-checkin')"><span class="ni">🧠</span><span class="nl">Check-in</span></button>
+    <button class="nbtn on" onclick="nav('s-learn')"><span class="ni">🎧</span><span class="nl">Learn</span></button>
+    <button class="nbtn" onclick="nav('s-peer')"><span class="ni">💬</span><span class="nl">Peer</span></button>
+    <button class="nbtn" onclick="nav('s-crisis')"><span class="ni">🆘</span><span class="nl">Crisis</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 6 — PEER
+══════════════════════════════ -->
+<div class="screen" id="s-peer">
+  <div class="s-header"><button class="btn btn-icon" onclick="nav('s-home')">←</button><div class="s-title">Talk to a Peer</div></div>
+  <div class="scrollable pb-nav px" style="flex:1;padding-top:8px">
+    <div class="card-teal row gap8" style="align-items:flex-start;margin-bottom:20px">
+      <span style="font-size:20px;flex-shrink:0">🔒</span>
+      <div class="t-body">Your conversations are completely anonymous. Peer counsellors come from neighbouring communities — your identity is never shared.</div>
+    </div>
+    <div class="t-label" style="margin-bottom:12px">Available now</div>
+    <div class="col gap8" style="margin-bottom:20px">
+      <div class="ccard" onclick="openChat('Amina K.','🧕','Nyarugenge','F')">
+        <div class="cavatar">🧕</div>
+        <div style="flex:1"><div class="t-h3">Amina K.</div><div class="t-small" style="margin:3px 0">📍 Serving Nyarugenge District</div><div class="row gap4"><div class="odot"></div><span class="t-small t-success">Available now</span></div></div>
+        <button class="btn btn-teal-sm" onclick="event.stopPropagation();openChat('Amina K.','🧕','Nyarugenge','F')">Chat</button>
+      </div>
+      <div class="ccard" onclick="openChat('Jean-Paul M.','👨🏾','Huye','M')">
+        <div class="cavatar">👨🏾</div>
+        <div style="flex:1"><div class="t-h3">Jean-Paul M.</div><div class="t-small" style="margin:3px 0">📍 Serving Huye District</div><div class="row gap4"><div class="odot"></div><span class="t-small t-success">Available now</span></div></div>
+        <button class="btn btn-teal-sm" onclick="event.stopPropagation();openChat('Jean-Paul M.','👨🏾','Huye','M')">Chat</button>
+      </div>
+      <div class="ccard" style="opacity:.6">
+        <div class="cavatar">👩🏾</div>
+        <div style="flex:1"><div class="t-h3">Claudette U.</div><div class="t-small" style="margin:3px 0">📍 Serving Musanze District</div><div class="t-small" style="color:var(--warn)">⏱ Back in 30 min</div></div>
+        <button class="btn btn-teal-sm" style="opacity:.4" onclick="toast('Claudette will be back in 30 minutes')">Chat</button>
+      </div>
+    </div>
+    <div class="t-label" style="margin-bottom:12px">Rwandan Sign Language (RSL) counsellors</div>
+    <div class="ccard" onclick="openChat('Patrick I.','🧑🏾','Kicukiro','RSL')">
+      <div class="cavatar" style="border-color:var(--gold)">🧑🏾</div>
+      <div style="flex:1"><div class="row gap8" style="flex-wrap:wrap"><span class="t-h3">Patrick I.</span><span class="badge bdg-gold" style="font-size:10px">RSL</span></div><div class="t-small" style="margin:3px 0">📍 Serving Kicukiro District</div><div class="row gap4"><div class="odot"></div><span class="t-small t-success">Available now</span></div></div>
+      <button class="btn btn-teal-sm" onclick="event.stopPropagation();openChat('Patrick I.','🧑🏾','Kicukiro','RSL')">Chat</button>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="nbtn" onclick="nav('s-home')"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nbtn" onclick="nav('s-checkin')"><span class="ni">🧠</span><span class="nl">Check-in</span></button>
+    <button class="nbtn" onclick="nav('s-learn')"><span class="ni">🎧</span><span class="nl">Learn</span></button>
+    <button class="nbtn on" onclick="nav('s-peer')"><span class="ni">💬</span><span class="nl">Peer</span></button>
+    <button class="nbtn" onclick="nav('s-crisis')"><span class="ni">🆘</span><span class="nl">Crisis</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 7 — CHAT
+══════════════════════════════ -->
+<div class="screen" id="s-chat">
+  <div style="padding:48px 16px 14px;display:flex;align-items:center;gap:12px;background:var(--navy2);border-bottom:1px solid var(--card-bd);flex-shrink:0">
+    <button class="btn btn-icon" style="background:none;border:none;font-size:22px;color:var(--white)" onclick="nav('s-peer')">←</button>
+    <div id="chat-av" style="width:44px;height:44px;border-radius:50%;background:var(--teal-bg);border:2px solid var(--teal-bd);display:flex;align-items:center;justify-content:center;font-size:24px">🧕</div>
+    <div style="flex:1"><div class="t-h3" id="chat-name">Amina K.</div><div class="t-small t-success">● Online · Peer counsellor</div></div>
+    <div class="badge bdg-teal">ANONYMOUS</div>
+  </div>
+  <div id="chat-msgs" class="scrollable" style="flex:1;padding:16px;display:flex;flex-direction:column;gap:12px">
+    <div class="cmsg recv">Muraho! I am here to listen. Everything you share is completely confidential. How are you feeling today? 🙏<div class="mtime">Now</div></div>
+    <div class="typing" id="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>
+  </div>
+  <div style="padding:10px 12px 24px;display:flex;gap:10px;align-items:flex-end;background:var(--navy);border-top:1px solid var(--card-bd);flex-shrink:0">
+    <textarea id="chat-input" placeholder="Type your message..." rows="1" style="flex:1;background:var(--card-bg);border:1px solid var(--card-bd);border-radius:20px;padding:12px 16px;color:var(--white);font-family:var(--fs);font-size:14px;resize:none;outline:none;max-height:90px" onkeydown="chatKey(event)"></textarea>
+    <button class="btn btn-main" onclick="sendMsg()" style="width:46px;height:46px;padding:0;border-radius:50%;flex-shrink:0;font-size:18px">➤</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 8 — CRISIS
+══════════════════════════════ -->
+<div class="screen" id="s-crisis">
+  <div class="s-header"><button class="btn btn-icon" onclick="nav('s-home')">←</button><div class="s-title">Crisis Support</div></div>
+  <div class="scrollable pb-nav px" style="flex:1;padding-top:8px">
+    <div class="card-danger" style="text-align:center;margin-bottom:20px">
+      <div style="font-size:44px;margin-bottom:10px">🆘</div>
+      <div class="t-h2" style="margin-bottom:8px">You are not alone</div>
+      <div class="t-body">If you are in crisis or feeling unsafe, please reach out immediately. Help is available right now, free of charge.</div>
+    </div>
+    <div class="t-label" style="margin-bottom:12px">Call now — free &amp; available 24/7</div>
+    <div class="col gap8" style="margin-bottom:20px">
+      <div class="hlcard">
+        <div class="ibox" style="background:rgba(46,213,115,.15)">📞</div>
+        <div style="flex:1"><div class="t-h3">Rwanda Mental Health Helpline</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:var(--fd);margin:4px 0">116</div><div class="t-small">Free · 24 hours · Kinyarwanda &amp; English</div></div>
+        <button class="btn btn-success" onclick="callHotline('116')">Call</button>
+      </div>
+      <div class="hlcard">
+        <div class="ibox" style="background:rgba(26,86,160,.2)">🏥</div>
+        <div style="flex:1"><div class="t-h3">RBC Mental Health Programme</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:var(--fd);margin:4px 0">3012</div><div class="t-small">Rwanda Biomedical Centre · Professional</div></div>
+        <button class="btn btn-success" onclick="callHotline('3012')">Call</button>
+      </div>
+      <div class="hlcard">
+        <div class="ibox" style="background:var(--teal-bg)">💬</div>
+        <div style="flex:1"><div class="t-h3">Umva Anonymous Crisis Chat</div><div class="t-small t-success" style="margin:4px 0;font-weight:600">● Available now</div><div class="t-small">Anonymous · Peer counsellor</div></div>
+        <button class="btn btn-teal-sm" onclick="openChat('Crisis Counsellor','🆘','Crisis','C')">Chat</button>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--card-bd);margin-bottom:20px"></div>
+    <div class="t-label" style="margin-bottom:12px">Calming breathing exercise</div>
+    <div class="card" id="breathe-card" style="text-align:center">
+      <div class="t-h3" style="margin-bottom:4px">4-7-8 Breathing Technique</div>
+      <div class="t-small" style="margin-bottom:4px">Tap the button below to start</div>
+      <div class="bcircle" id="b-circle">🫁</div>
+      <div class="t-teal" style="font-size:16px;font-weight:600;min-height:26px" id="b-text">Tap to begin</div>
+      <div class="t-small" style="margin-top:6px" id="b-sub">Inhale 4s · Hold 7s · Exhale 8s</div>
+      <button class="btn btn-teal-sm" onclick="startBreathe()" style="margin-top:16px;width:100%">Start Breathing Exercise</button>
+      <button class="btn btn-outline" onclick="stopBreathe()" id="b-stop" style="margin-top:8px;width:100%;display:none">Stop</button>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="nbtn" onclick="nav('s-home')"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nbtn" onclick="nav('s-checkin')"><span class="ni">🧠</span><span class="nl">Check-in</span></button>
+    <button class="nbtn" onclick="nav('s-learn')"><span class="ni">🎧</span><span class="nl">Learn</span></button>
+    <button class="nbtn" onclick="nav('s-peer')"><span class="ni">💬</span><span class="nl">Peer</span></button>
+    <button class="nbtn on" onclick="nav('s-crisis')"><span class="ni">🆘</span><span class="nl">Crisis</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 9 — REFERRAL
+══════════════════════════════ -->
+<div class="screen" id="s-referral">
+  <div class="s-header"><button class="btn btn-icon" onclick="nav('s-home')">←</button><div class="s-title">Get Professional Help</div></div>
+  <div class="scrollable pb-nav px" style="flex:1;padding-top:8px">
+    <div class="t-body" style="margin-bottom:16px">When your peer counsellor or check-in suggests professional support, Umva connects you directly to mental health services covered by your Mutuelle de Santé card — at no extra cost.</div>
+    <div class="card row gap14" style="margin-bottom:20px;gap:14px">
+      <div style="font-size:40px">💳</div>
+      <div><div class="t-h3" style="margin-bottom:4px">Mutuelle de Santé</div><div class="t-body">Mental health services are covered. Bring your Mutuelle card — you do not pay out of pocket.</div></div>
+    </div>
+    <div class="t-label" style="margin-bottom:16px">How the referral works</div>
+    <div class="col gap8" style="margin-bottom:20px">
+      <div class="rstep"><div class="rnum">1</div><div><div class="t-h3" style="margin-bottom:4px">Complete your wellness check-in</div><div class="t-body">Your check-in identifies whether professional support would benefit you. Your answers are private.</div></div></div>
+      <div class="rstep"><div class="rnum">2</div><div><div class="t-h3" style="margin-bottom:4px">Discuss with your peer counsellor</div><div class="t-body">Your peer counsellor reviews your situation and helps you decide if a referral is the right step.</div></div></div>
+      <div class="rstep"><div class="rnum">3</div><div><div class="t-h3" style="margin-bottom:4px">Receive your referral note</div><div class="t-body">Umva generates a referral note to present at any Mutuelle-linked mental health facility.</div></div></div>
+      <div class="rstep" style="padding-bottom:0"><div class="rnum">4</div><div><div class="t-h3" style="margin-bottom:4px">Access professional care</div><div class="t-body">Visit the facility with your Mutuelle card. Your peer counsellor can accompany you if you wish.</div></div></div>
+    </div>
+    <div class="t-label" style="margin-bottom:12px">Nearby facilities</div>
+    <div class="col gap8" style="margin-bottom:20px">
+      <div class="hlcard"><div class="ibox" style="background:rgba(46,213,115,.12);font-size:24px">🏥</div><div><div class="t-h3" style="margin-bottom:4px">Caraes Ndera Hospital</div><div class="t-body">Kigali · Mental health specialist</div><div class="t-small t-success" style="margin-top:4px;font-weight:600">✓ Mutuelle de Santé accepted</div></div></div>
+      <div class="hlcard"><div class="ibox" style="background:rgba(26,86,160,.15);font-size:24px">🏥</div><div><div class="t-h3" style="margin-bottom:4px">Butaro District Hospital</div><div class="t-body">Burera · Mental health unit</div><div class="t-small t-success" style="margin-top:4px;font-weight:600">✓ Mutuelle de Santé accepted</div></div></div>
+    </div>
+    <button class="btn btn-main" onclick="requestRef()">Request a Referral Now</button>
+    <div style="height:20px"></div>
+  </div>
+  <div class="bnav">
+    <button class="nbtn" onclick="nav('s-home')"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nbtn" onclick="nav('s-checkin')"><span class="ni">🧠</span><span class="nl">Check-in</span></button>
+    <button class="nbtn" onclick="nav('s-learn')"><span class="ni">🎧</span><span class="nl">Learn</span></button>
+    <button class="nbtn on" onclick="nav('s-peer')"><span class="ni">💬</span><span class="nl">Peer</span></button>
+    <button class="nbtn" onclick="nav('s-crisis')"><span class="ni">🆘</span><span class="nl">Crisis</span></button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════
+function nav(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('show')});
+  var el=document.getElementById(id);
+  if(el){el.classList.add('show');try{el.querySelector('.scrollable').scrollTop=0}catch(e){}}
+}
+
+// ════════════════════════════════
+// HOME DATE
+// ════════════════════════════════
+(function(){
+  var d=new Date();
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('h-date').textContent=days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+})();
+
+// ════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════
+var obIdx=0;
+function obSync(){
+  var slides=document.querySelectorAll('.ob-slide');
+  var dots=document.querySelectorAll('.ob-dot');
+  var back=document.getElementById('ob-back');
+  var next=document.getElementById('ob-next');
+  slides.forEach(function(s,i){s.style.display=i===obIdx?'flex':'none'});
+  dots.forEach(function(d,i){d.style.width=i===obIdx?'24px':'8px';d.style.background=i===obIdx?'var(--teal)':'var(--card-bd)'});
+  back.style.display=obIdx===0?'none':'inline-flex';
+  next.textContent=obIdx===slides.length-1?'Get Started →':'Next →';
+}
+function obNext(){var s=document.querySelectorAll('.ob-slide');if(obIdx>=s.length-1){nav('s-home');return;}obIdx++;obSync();}
+function obPrev(){if(obIdx>0){obIdx--;obSync();}}
+obSync();
+
+// ════════════════════════════════
+// QUICK MOOD
+// ════════════════════════════════
+function qMood(btn,emoji,label){
+  document.querySelectorAll('.moodbtn').forEach(function(b){b.classList.remove('sel')});
+  btn.classList.add('sel');
+  toast('Mood logged: '+emoji+' '+label);
+  setTimeout(function(){resetCheckin();nav('s-checkin');},1100);
+}
+
+// ════════════════════════════════
+// WELLNESS CHECK-IN
+// ════════════════════════════════
+var cAns_data={};
+function resetCheckin(){
+  cAns_data={};
+  document.getElementById('cq1').style.display='flex';
+  document.getElementById('cq2').style.display='none';
+  document.getElementById('cq3').style.display='none';
+  document.getElementById('cresult').style.display='none';
+  ['pb1','pb2','pb3'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    el.className='pbar'+(i===0?' cur':'');
+  });
+  document.querySelectorAll('.optbtn').forEach(function(b){b.classList.remove('sel')});
+}
+function cAns(q,btn,val){
+  document.querySelectorAll('#cq'+q+' .optbtn').forEach(function(b){b.classList.remove('sel')});
+  btn.classList.add('sel');
+  cAns_data[q]=val;
+  setTimeout(function(){
+    document.getElementById('cq'+q).style.display='none';
+    document.getElementById('pb'+q).className='pbar done';
+    if(q<3){
+      var nq=q+1;
+      document.getElementById('cq'+nq).style.display='flex';
+      document.getElementById('pb'+nq).className='pbar cur';
+    } else {
+      showCResult();
+    }
+  },350);
+}
+function showCResult(){
+  var m=cAns_data[1],s=cAns_data[2],n=cAns_data[3];
+  var icon='✅',title='Check-in complete',text='',btns=[];
+  if(m==='verylow'){
+    icon='💙';title='We hear you';
+    text='It takes courage to acknowledge how you feel. You are not alone. We strongly recommend connecting with a peer counsellor today.';
+    btns=[{l:'💬 Talk to a peer counsellor',a:"nav('s-peer')",p:true},{l:'🆘 Crisis support',a:"nav('s-crisis')",p:false}];
+  } else if(m==='low'||s==='none'){
+    icon='🤝';title='Support is available';
+    text='Feeling this way is more common than you think. A peer counsellor can help you process your feelings in a safe, anonymous space.';
+    btns=[{l:'💬 Connect with a peer',a:"nav('s-peer')",p:true},{l:'🎧 Listen to audio content',a:"nav('s-learn')",p:false}];
+  } else if(n==='pro'){
+    icon='🏥';title='Getting professional help';
+    text='Seeking professional support is a sign of strength. Umva connects you to Mutuelle de Santé-covered mental health services.';
+    btns=[{l:'🏥 See referral pathway',a:"nav('s-referral')",p:true},{l:'💬 Talk to a peer first',a:"nav('s-peer')",p:false}];
+  } else if(n==='calm'){
+    icon='🧘';title='Let us breathe together';
+    text='Calming techniques can make a real difference. Try our guided 4-7-8 breathing exercise — it helps regulate your nervous system within minutes.';
+    btns=[{l:'🌬 Start breathing exercise',a:"nav('s-crisis')",p:true},{l:'🎧 Listen to calming audio',a:"nav('s-learn')",p:false}];
+  } else {
+    icon='🌟';title='You are doing well';
+    text='Great job taking care of your mental health. Keep building your wellness habits. Explore audio content to continue growing.';
+    btns=[{l:'🎧 Explore audio content',a:"nav('s-learn')",p:true},{l:'🏠 Back to home',a:"nav('s-home')",p:false}];
+  }
+  document.getElementById('cr-icon').textContent=icon;
+  document.getElementById('cr-title').textContent=title;
+  document.getElementById('cr-text').textContent=text;
+  var ac=document.getElementById('cr-actions');
+  ac.innerHTML=btns.map(function(b){
+    return '<button onclick="'+b.a+'" class="ract '+(b.p?'primary':'secondary')+'">'+b.l+'</button>';
+  }).join('');
+  document.getElementById('cresult').style.display='flex';
+}
+
+// ════════════════════════════════
+// AUDIO PLAYER
+// ════════════════════════════════
+var audTimer=null,audPlaying=-1,audSec=0,audTotal=0;
+function playAudio(idx,title,dur){
+  if(audPlaying===idx){stopAudio();return;}
+  stopAudio();
+  audPlaying=idx;audSec=0;
+  var parts=dur.split(':');
+  audTotal=parseInt(parts[0])*60+parseInt(parts[1]);
+  // highlight card
+  document.querySelectorAll('.acard').forEach(function(c){c.style.borderColor=''});
+  document.getElementById('aud'+idx).style.borderColor='var(--teal)';
+  // update play btn
+  for(var i=0;i<5;i++){
+    var ap=document.getElementById('ap'+i);
+    if(ap){ap.textContent=i===idx?'■':'▶';ap.className=i===idx?'aplay playing':'aplay';}
+  }
+  // show player bar
+  document.getElementById('pb-title').textContent=title;
+  document.getElementById('pb-sub').textContent='Now playing · '+dur;
+  document.getElementById('player-bar').classList.add('show');
+  // progress
+  audTimer=setInterval(function(){
+    audSec++;
+    var pct=Math.min(100,Math.round(audSec/audTotal*100));
+    document.getElementById('pb-fill').style.width=pct+'%';
+    if(audSec>=audTotal){stopAudio();toast('✅ Finished: '+title);}
+  },1000);
+  toast('▶ Now playing: '+title);
+}
+function stopAudio(){
+  if(audTimer){clearInterval(audTimer);audTimer=null;}
+  audPlaying=-1;
+  document.getElementById('player-bar').classList.remove('show');
+  document.getElementById('pb-fill').style.width='0%';
+  document.querySelectorAll('.acard').forEach(function(c){c.style.borderColor=''});
+  for(var i=0;i<5;i++){var ap=document.getElementById('ap'+i);if(ap){ap.textContent='▶';ap.className='aplay';}}
+}
+
+// ════════════════════════════════
+// RSL VIDEO PLAYER
+// ════════════════════════════════
+var rslTimer=null,rslPlaying=-1;
+var rslEmojis=['🧠','💆','🤝','🫂','🕊️'];
+function playRSL(idx,title){
+  if(rslPlaying===idx){stopRSL();return;}
+  stopRSL();
+  rslPlaying=idx;
+  document.querySelectorAll('.rslvid').forEach(function(v){v.classList.remove('playing')});
+  document.getElementById('rsl'+idx).classList.add('playing');
+  document.getElementById('rsl-icon').textContent=rslEmojis[idx];
+  document.getElementById('rsl-icon-big').textContent=rslEmojis[idx];
+  document.getElementById('rsl-title').textContent=title;
+  document.getElementById('rsl-player').style.display='block';
+  document.getElementById('rsl-fill').style.width='0%';
+  var sec=0,total=60;
+  rslTimer=setInterval(function(){
+    sec++;
+    document.getElementById('rsl-fill').style.width=Math.min(100,Math.round(sec/total*100))+'%';
+    if(sec>=total){stopRSL();toast('✅ Finished RSL video: '+title);}
+  },1000);
+  toast('▶ Playing Rwandan Sign Language video: '+title);
+}
+function stopRSL(){
+  if(rslTimer){clearInterval(rslTimer);rslTimer=null;}
+  rslPlaying=-1;
+  document.getElementById('rsl-player').style.display='none';
+  document.querySelectorAll('.rslvid').forEach(function(v){v.classList.remove('playing')});
+}
+
+// ════════════════════════════════
+// CHAT
+// ════════════════════════════════
+var replies=[
+  'Thank you for sharing that with me. Can you tell me a bit more about what has been happening?',
+  'I hear you. That sounds really difficult. You were brave to reach out today.',
+  'It is completely normal to feel this way. Many young people in Rwanda go through similar experiences.',
+  'I am here with you. There is no rush — take your time.',
+  'Would it help to try a simple breathing exercise together? Sometimes slowing down first makes everything easier.',
+  'You are not alone in this. Umva\'s peer circles meet regularly in your district — would you like more information about joining one?',
+  'I want you to know that what you are going through is valid. You deserve support and care.'
+];
+var rIdx=0;
+function openChat(name,av,area,type){
+  document.getElementById('chat-name').textContent=name;
+  document.getElementById('chat-av').textContent=av;
+  var msgs=document.getElementById('chat-msgs');
+  var greeting=type==='RSL'
+    ? 'Muraho! I communicate in Rwandan Sign Language (RSL) and text. Everything you share is completely confidential. How are you feeling today? 🙏'
+    : type==='C'
+    ? 'This is the Umva crisis support line. I am here for you right now. Please tell me what is happening — you are safe here. 💙'
+    : 'Muraho! I am here to listen. Everything you share is completely confidential. How are you feeling today? 🙏';
+  msgs.innerHTML='<div class="cmsg recv">'+greeting+'<div class="mtime">Now</div></div><div class="typing" id="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  nav('s-chat');
+}
+function sendMsg(){
+  var input=document.getElementById('chat-input');
+  var text=input.value.trim();
+  if(!text)return;
+  var msgs=document.getElementById('chat-msgs');
+  var t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  // append sent message
+  var typing=document.getElementById('typing');
+  msgs.insertBefore(createMsg(text,t,'sent'),typing);
+  input.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+  // show typing indicator
+  typing.classList.add('show');
+  setTimeout(function(){
+    typing.classList.remove('show');
+    var r=replies[rIdx%replies.length];rIdx++;
+    msgs.insertBefore(createMsg(r,t,'recv'),typing);
+    msgs.scrollTop=msgs.scrollHeight;
+  },1500);
+}
+function createMsg(text,time,type){
+  var div=document.createElement('div');
+  div.className='cmsg '+type;
+  div.innerHTML=text+'<div class="mtime">'+time+'</div>';
+  return div;
+}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+
+// ════════════════════════════════
+// HOTLINE CALL
+// ════════════════════════════════
+function callHotline(num){
+  toast('📞 Connecting to '+num+'... Please hold.');
+  setTimeout(function(){toast('✅ Call initiated. Stay on the line — help is coming.');},2000);
+}
+
+// ════════════════════════════════
+// REFERRAL
+// ════════════════════════════════
+function requestRef(){
+  toast('✅ Referral request sent to your peer counsellor. They will contact you shortly.');
+  setTimeout(function(){toast('📋 Your referral note has been generated. Show it at any Mutuelle-linked facility.');},3500);
+}
+
+// ════════════════════════════════
+// BREATHING EXERCISE
+// ════════════════════════════════
+var bActive=false,bTimer=null;
+var bPhases=[
+  {label:'Inhale slowly...',sub:'Breathe in through your nose — 4 seconds',dur:4000,big:true},
+  {label:'Hold your breath...',sub:'Stay still and hold — 7 seconds',dur:7000,big:true},
+  {label:'Exhale slowly...',sub:'Breathe out through your mouth — 8 seconds',dur:8000,big:false}
+];
+var bPhaseIdx=0;
+function startBreathe(){
+  if(bActive)return;
+  bActive=true;
+  document.getElementById('b-stop').style.display='block';
+  document.querySelector('#breathe-card .btn-teal-sm').style.display='none';
+  bPhaseIdx=0;
+  runPhase();
+}
+function runPhase(){
+  if(!bActive)return;
+  var p=bPhases[bPhaseIdx%3];
+  document.getElementById('b-text').textContent=p.label;
+  document.getElementById('b-sub').textContent=p.sub;
+  var c=document.getElementById('b-circle');
+  if(p.big)c.classList.add('inhale');else c.classList.remove('inhale');
+  bPhaseIdx++;
+  bTimer=setTimeout(runPhase,p.dur);
+}
+function stopBreathe(){
+  bActive=false;
+  if(bTimer){clearTimeout(bTimer);bTimer=null;}
+  document.getElementById('b-circle').classList.remove('inhale');
+  document.getElementById('b-text').textContent='Tap to begin';
+  document.getElementById('b-sub').textContent='Inhale 4s · Hold 7s · Exhale 8s';
+  document.getElementById('b-stop').style.display='none';
+  document.querySelector('#breathe-card .btn-teal-sm').style.display='block';
+  toast('✅ Breathing exercise complete. Well done!');
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+var tTimer=null;
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.style.display='block';
+  if(tTimer)clearTimeout(tTimer);
+  tTimer=setTimeout(function(){el.style.display='none';},3200);
+}
+</script>
+</div>
+</body>
+</html>
